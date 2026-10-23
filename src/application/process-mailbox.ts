@@ -1,0 +1,1 @@
+export async function processSequential<T>(items:T[],run:(item:T)=>Promise<unknown>):Promise<unknown[]>{const result:unknown[]=[];for(const item of items){try{result.push(await run(item));}catch{result.push({ok:false,error:'Mensaje falló; lote continúa'});}}return result;}

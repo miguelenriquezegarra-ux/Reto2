@@ -1,0 +1,14 @@
+node_modules/
+dist/
+out/
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+test-results/
+playwright-report/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp

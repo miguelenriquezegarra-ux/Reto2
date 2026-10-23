@@ -1,0 +1,2 @@
+import { normalize } from './parsers.js';
+export function similarity(left:string,right:string):number{const a=normalize(left),b=normalize(right);if(!a||!b)return 0;let prev=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const row=[i];for(let j=1;j<=b.length;j++)row[j]=Math.min((row[j-1]??0)+1,(prev[j]??0)+1,(prev[j-1]??0)+(a[i-1]===b[j-1]?0:1));prev=row;}return 1-(prev[b.length]??0)/Math.max(a.length,b.length);}

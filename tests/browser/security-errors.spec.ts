@@ -1,0 +1,6 @@
+import { test,expect } from '@playwright/test';
+test('shows provider errors, retains the session and reports the iteration limit',async({page})=>{
+ await page.goto('/');await page.getByLabel('Mensaje').fill('test:provider-error');await page.getByRole('button',{name:'Enviar',exact:true}).click();await expect(page.getByText('Proveedor simulado no disponible',{exact:false})).toBeVisible();
+ await page.getByLabel('Mensaje').fill('test:limit');await page.getByRole('button',{name:'Enviar',exact:true}).click();await expect(page.getByText('Límite de iteraciones alcanzado',{exact:false})).toBeVisible();await page.reload();await expect(page.getByText('Límite de iteraciones alcanzado',{exact:false})).toBeVisible();
+});
+test('user markup is escaped and invalid session does not expose server files',async({page,request})=>{await page.goto('/');await page.getByLabel('Mensaje').fill('<img src=x onerror="window.hacked=true">');await page.getByRole('button',{name:'Enviar',exact:true}).click();await expect(page.locator('article.user pre')).toHaveText('<img src=x onerror="window.hacked=true">');expect(await page.evaluate(()=>Reflect.get(window,'hacked'))).toBeUndefined();expect((await request.get('/api/sessions/invalid')).status()).toBe(400);});

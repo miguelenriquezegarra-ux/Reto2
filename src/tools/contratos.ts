@@ -1,0 +1,14 @@
+import { defineTool } from '../application/tool.js';
+import { readMailbox } from '../application/leer-buzon.js';
+import { z } from 'zod';
+import { extractMessage } from '../application/extraer.js';
+import { extractionSchema } from '../domain/schemas.js';
+import { validateMessage } from '../application/validar.js';
+import { registerMessage } from '../application/registrar.js';
+import { generateAlerts } from '../application/alertas.js';
+import { dateSchema } from '../domain/schemas.js';
+export const leer_buzon=defineTool('leer_buzon','Lista mensajes pendientes del buzón con sus adjuntos y rechazos.',{},async(_args,ctx)=>readMailbox(ctx));
+export const extraer=defineTool('extraer','Extrae datos contractuales y confianza desde el adjunto textual.',{mensaje_id:z.string().describe('Identificador del mensaje del buzón')},async(args,ctx)=>extractMessage(args.mensaje_id,ctx));
+export const validar=defineTool('validar','Valida datos, identidad, clasificación y revisión contra el maestro.',{mensaje_id:z.string().describe('Mensaje fuente'),contrato:extractionSchema.describe('Datos extraídos y propuestas a validar')},async(args,ctx)=>validateMessage(args.mensaje_id,args.contrato,ctx));
+export const registrar=defineTool('registrar','Registra un contrato validado y archiva el adjunto con auditoría.',{mensaje_id:z.string().describe('Mensaje fuente'),contrato:extractionSchema.describe('Candidato contractual'),confirmado:z.boolean().optional().describe('Confirmación humana explícita del candidato')},async(args,ctx)=>registerMessage(args.mensaje_id,args.contrato,args.confirmado??false,ctx));
+export const alertas=defineTool('alertas','Genera reporte de vencimientos, pólizas y altas desde el corte.',{hoy:dateSchema.describe('Fecha de referencia YYYY-MM-DD')},async(args,ctx)=>generateAlerts(args.hoy,ctx));

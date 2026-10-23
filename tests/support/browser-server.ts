@@ -1,0 +1,14 @@
+import { createServer } from 'vite';
+import { readFile } from 'node:fs/promises';
+import { workspace } from './workspace.js';
+import { extract } from '../../src/domain/extract.js';
+import { ScriptedAdapter } from './llm-adapter.js';
+import { createApp } from '../../src/server.js';
+import { loadConfig } from '../../src/config.js';
+import { fixtureAdapter } from './fixture-adapter.js';
+import type { LlmAdapter } from '../../src/llm/adapter.js';
+const w=await workspace(),candidate=extract(await readFile('fixtures/reto-02/buzon/msg-006/contrato.txt','utf8'));
+const fake:LlmAdapter=await fixtureAdapter();
+const controlled:LlmAdapter={enviar:async(messages,tools,session,signal)=>{const text=messages.findLast(m=>m.role==='user')?.content??'';if(text.includes('test:provider-error'))throw new Error('Proveedor simulado no disponible');if(text.includes('test:limit'))return {texto:'',toolCalls:[{id:'limit',nombre:'contratos_leer_buzon',argumentos:{}}],usage:{inputTokens:0,outputTokens:0}};return fake.enviar(messages,tools,session,signal);}};
+const app=await createApp(w.ctx.directory,controlled,loadConfig({OPENAI_API_KEY:'fake-browser-only'}));
+const vite=await createServer({server:{middlewareMode:true},appType:'spa'});app.use(vite.middlewares);app.listen(3101,'127.0.0.1');

@@ -1,0 +1,1 @@
+﻿Gate T051: 2026-10-22. npm test: 23/23 en21archivos. Typecheck pasa. npm run demo pasa sin clave/LLM; primera pasada10filas, otrosí y msg-006 pendientes; segunda con datos humanos declarados:11filas,4historiales,6procesados,0duplicados. No equivalencia con release ni smoke real.
